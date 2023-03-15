@@ -493,6 +493,9 @@ class SnowflakeCompiler(compiler.SQLCompiler):
     def visit_now_func(self, now, **kw):
         return "CURRENT_TIMESTAMP"
 
+    def visit_sysdate_func(self, sysdate, **kw):
+        return "SYSDATE()"
+
     def visit_merge_into(self, merge_into, **kw):
         clauses = " ".join(
             clause._compiler_dispatch(self, **kw) for clause in merge_into.clauses
