@@ -33,6 +33,14 @@ class TestSnowflakeCompiler(AssertsCompiledSQL):
             dialect="snowflake",
         )
 
+    def test_sysdate(self):
+        statement = select(func.sysdate())
+        self.assert_compile(
+            statement,
+            "SELECT SYSDATE() AS sysdate_1",
+            dialect="snowflake",
+        )
+
     def test_multi_table_delete(self):
         statement = table1.delete().where(table1.c.id == table2.c.id)
         self.assert_compile(
