@@ -208,6 +208,38 @@ class SnowflakeCompiler(compiler.SQLCompiler):
                 " SET %s" % sets if merge_into_clause.set else "",
             )
 
+    def visit_insert_all(self, insert_all, **kw):
+        clauses = []
+        for condition, table, columns, values in insert_all.clauses:
+            clauses.append(
+                (
+                    f"WHEN {condition._compiler_dispatch(self, include_table=False, **kw)} THEN "
+                    if condition is not None
+                    else ""
+                )
+                + f"INTO {table._compiler_dispatch(self, asfrom=True, **kw)}"
+                + (
+                    f" ({', '.join(c._compiler_dispatch(self, include_table=False, **kw) for c in columns)})"
+                    if columns
+                    else ""
+                )
+                + (
+                    f" VALUES ({', '.join(v._compiler_dispatch(self, include_table=False, **kw) for v in values)})"
+                    if values
+                    else ""
+                )
+            )
+
+        source = insert_all.source._compiler_dispatch(self, **kw)
+        else_ = (
+            f" ELSE {insert_all.else__._compiler_dispatch(self, **kw)}"
+            if insert_all.else__
+            else ""
+        )
+        overwrite = " OVERWRITE" if insert_all.overwrite else ""
+        condition = "FIRST" if insert_all.is_conditional and insert_all.first else "ALL"
+        return f"INSERT{overwrite} {condition} {' '.join(clauses)}{else_} {source}"
+
     def visit_copy_into(self, copy_into, **kw):
         if hasattr(copy_into, "formatter") and copy_into.formatter is not None:
             formatter = copy_into.formatter._compiler_dispatch(self, **kw)
