@@ -35,7 +35,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import DBAPIError, NoSuchTableError
 from sqlalchemy.pool import NullPool
-from sqlalchemy.sql import and_, insert, not_, or_, select
+from sqlalchemy.sql import and_, not_, or_, select
 
 import snowflake.connector.errors
 import snowflake.sqlalchemy.snowdialect
@@ -1425,9 +1425,6 @@ def test_autoincrement(engine_testaccount):
         Column("uid", Integer, Sequence("id_seq", order=True), primary_key=True),
         Column("name", String(39)),
     )
-
-    insert_stmt = insert(users)
-    select_stmt = select(users.c.name).order_by("uid")
 
     try:
         metadata.create_all(engine_testaccount)
