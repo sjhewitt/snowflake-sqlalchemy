@@ -9,6 +9,10 @@ Source code is also available at:
 
 # Release Notes
 
+- v1.6.0(Not released)
+
+  - support for installing with SQLAlchemy 2.0.x
+
 - v1.5.3(Unrelased)
 
   - Limit SQLAlchemy to < 2.0.0 before releasing version compatible with 2.0
